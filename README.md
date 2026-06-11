@@ -1,81 +1,99 @@
-# Face Recognition Attendance System
+# FaceAttend - Smart Attendance System
 
-This project implements a real-time face recognition attendance system using DeepFace for face embedding extraction and a Support Vector Machine (SVM) classifier for identity recognition. It includes functionality for image augmentation, training, and logging attendance in an Excel file based on live webcam input.
+A real-time face recognition attendance system with a modern desktop GUI. Uses DeepFace for face embedding extraction and an SVM classifier for identity recognition. Built with CustomTkinter for a sleek dark-themed interface.
 
 ## Features
 
-- Image augmentation using Keras `ImageDataGenerator`
-- Face embedding extraction using DeepFace with the Facenet model
-- SVM-based identity classification with scikit-learn
-- Real-time face recognition using OpenCV and webcam
-- Attendance logging to `attendance.xlsx`
-- Prevents duplicate attendance entries per person per day
+- **Face Registration** - Capture photos via webcam with real-time face detection
+- **Image Augmentation** - OpenCV-based augmentation (rotation, shift, zoom, flip, brightness) for robust training
+- **Face Embedding Extraction** - DeepFace with the Facenet model
+- **SVM Classification** - scikit-learn SVM for identity recognition with confidence scoring
+- **Real-time Recognition** - Live webcam feed with face detection overlays
+- **Attendance Sessions** - Start/stop sessions, auto-mark attendance with duplicate prevention
+- **Excel Export** - Formatted attendance reports exported to `.xlsx`
+- **Settings Panel** - Configurable camera source (USB/IP), confidence threshold, recognition interval, and appearance mode
 
 ## Requirements
 
-Install the required Python packages:
+- Python 3.10+
+- Webcam (USB or IP camera)
+
+## Installation
 
 ```bash
-pip install opencv-python deepface scikit-learn tensorflow pandas numpy
-Ensure that your system has a webcam and supports OpenCV.
+# Create a virtual environment (use a short path on Windows to avoid long-path issues with TensorFlow)
+python -m venv D:\venvs\faceattend
 
-Project Structure
-graphql
-Copy
-Edit
-project/
-├── attendance.xlsx         # Automatically created after attendance is logged
-├── svm_model.pkl           # Saved trained SVM model
-├── label_dict.pkl          # Dictionary mapping labels to names
-├── main.py                 # Main Python script
-├── README.md               # Project documentation
-└── Facial Dataset/         # Folder containing images organized in subfolders by person
-    ├── Person1/
-    │   ├── image1.jpg
-    │   └── ...
-    └── Person2/
-        └── ...
-How to Use
-Prepare the dataset:
+# Activate the virtual environment
+# Windows PowerShell:
+D:\venvs\faceattend\Scripts\Activate.ps1
+# Windows CMD:
+D:\venvs\faceattend\Scripts\activate.bat
+# Linux/macOS:
+source .venv/bin/activate
 
-Create a directory named Facial Dataset.
+# Install dependencies
+pip install -r requirements.txt
+```
 
-Inside it, create one subfolder per individual (e.g., John_Doe/, Jane_Doe/) containing facial images.
+## Usage
 
-Update the dataset path:
-In the main() function of main.py, update the folder path accordingly:
-
-python
-Copy
-Edit
-folder_path = r"F:\\Facial Dataset"
-Run the script:
-Execute the following command:
-
-bash
-Copy
-Edit
+```bash
 python main.py
-System workflow:
+```
 
-Preprocesses and augments dataset images
+### Workflow
 
-Extracts embeddings from each image
+1. **Register Students** - Navigate to "Register Student", enter name and ID, capture 5 photos
+2. **Train Model** - Happens automatically after registration
+3. **Start Session** - Go to Dashboard, click "Start Session" to begin attendance tracking
+4. **View Records** - Check "Attendance Log" for current and past session records
+5. **Export** - Sessions are auto-exported to Excel when stopped
 
-Trains an SVM classifier on embeddings
+## Project Structure
 
-Starts real-time face recognition via webcam
+```
+project/
+├── main.py                  # Entry point
+├── config.py                # Settings, paths, colors, fonts
+├── requirements.txt         # Python dependencies
+├── core/
+│   ├── face_engine.py       # DeepFace embedding + SVM training/recognition
+│   ├── camera.py            # Threaded camera capture
+│   ├── attendance.py        # Session management + attendance marking
+│   └── student_manager.py   # Student registration + deletion
+├── ui/
+│   ├── app.py               # Main application window
+│   ├── dashboard.py         # Live camera feed + session controls
+│   ├── registration.py      # Student registration form
+│   ├── attendance_viewer.py # Attendance records table
+│   ├── settings.py          # Camera, recognition, appearance settings
+│   └── widgets/
+│       ├── sidebar.py       # Navigation sidebar
+│       ├── camera_preview.py # Camera feed widget
+│       └── status_bar.py    # Bottom status bar
+├── utils/
+│   ├── image_utils.py       # Augmentation, resizing, drawing utilities
+│   ├── excel_export.py      # Formatted Excel report generation
+│   └── threading_utils.py   # Event bus for cross-thread communication
+└── data/                    # Auto-created at runtime
+    ├── faces/               # Registered student face images
+    ├── models/              # Trained SVM model + label dictionary
+    └── attendance_records/  # Exported Excel attendance reports
+```
 
-Logs attendance to attendance.xlsx
+## Configuration
 
-Notes
-The system uses DeepFace's Facenet model for embedding extraction.
+Settings are saved to `data/settings.json` and can be adjusted from the Settings screen:
 
-You can adjust the confidence threshold for recognition (default is 0.6) in the real_time_attendance() function.
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Camera Source | USB (index 0) | USB webcam or IP camera (RTSP/HTTP) |
+| Confidence Threshold | 60% | Minimum confidence for attendance marking |
+| Recognition Interval | 500ms | Time between recognition attempts |
+| Appearance Mode | Dark | Dark, Light, or System |
 
-Attendance is recorded only once per individual per day to avoid duplicates.
+## Author
 
-Author
 Muhammad Muzammil
-BlackAlpha-debug
-F2022376106@gmail.com
+[BlackAlpha-debug](https://github.com/BlackAlpha-debug)
